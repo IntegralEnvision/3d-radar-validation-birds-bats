@@ -1,0 +1,32 @@
+# Raw data are stored locally and distributed separately.
+data/**
+!data/README.md
+
+# Generated analysis products and intermediate bundles.
+output/
+derived_data/*.rds
+
+# Temporary validation files.
+tmp/
+*_check.rds
+*_candidate.rds
+
+# R and RStudio session files.
+.Rproj.user/
+.Rhistory
+.RData
+.RDataTmp*
+.Ruserdata
+Rplots.pdf
+*.Rproj.user
+
+# renv local cache/library; retain renv.lock and activation files.
+renv/library/
+renv/staging/
+renv/python/
+
+# Operating-system and editor files.
+.DS_Store
+Thumbs.db
+*.swp
+*~
