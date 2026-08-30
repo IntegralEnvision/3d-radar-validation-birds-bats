@@ -13,6 +13,8 @@ run_script(file.path("scripts", "check_repository.R"), "--require-data")
 # Detection opportunities: drone-based complete time windows, including misses.
 run_script(file.path("scripts", "detection_rate_analysis.R"))
 
+run_script(file.path('scripts', 'detection_rate_figures.R'))
+
 # Positional deviation: approved common-grid alignment for radar detections only.
 run_script(file.path("scripts", "positional_deviation_analysis.R"))
 run_script(file.path("scripts", "positional_deviation_figures.R"))
