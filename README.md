@@ -67,15 +67,15 @@ From the repository root:
 Rscript "scripts\run_all_analyses.R"
 ```
 
-This validates the repository, runs the detection-rate analysis, runs the positional-deviation analysis, and creates the paper figures. The runner keeps the two alignment methods separate.
+This validates the repository, runs the detection-rate analysis, runs the positional-discrepancy analysis, and creates the paper figures. The runner keeps the two radar-drone data alignment methods separate.
 
 Individual entry points are also available:
 
 ```powershell
 Rscript "scripts\detection_rate_analysis.R"
 Rscript "scripts\detection_rate_figures.R"
-Rscript "scripts\positional_deviation_analysis.R"
-Rscript "scripts\positional_deviation_figures.R"
+Rscript "scripts\positional_discrepancy_analysis.R"
+Rscript "scripts\positional_discrepancy_figures.R"
 ```
 
 Selected result paths and radar parameters can also be overridden with the command-line options documented in the analysis scripts.
@@ -83,14 +83,14 @@ Selected result paths and radar parameters can also be overridden with the comma
 ## Generated outputs
 
 - `output/detection_rate/` - detection-rate figures and summary tables.
-- `output/positional_deviation/` - positional-deviation figures.
+- `output/positional_discrepancy/` - positional-discrepancy figures.
 - `output/detection_rate_qc/` - independent QC outputs.
 - `derived_data/detection_rate_results.rds` - consolidated detection-rate intermediate results.
-- `derived_data/positional_deviation_results.rds` - consolidated positional-deviation intermediate results.
+- `derived_data/positional_discrepancy_results.rds` - consolidated positional-discrepancy intermediate results.
 
 These products remain local and are ignored by Git. The preserved baseline PDFs under `validation/` are intentionally tracked.
 
-## Before making the repository public
+## TODO
 
 Two author decisions remain:
 
