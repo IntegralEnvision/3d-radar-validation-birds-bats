@@ -18,7 +18,7 @@ detection_rate:
   results_file: derived_data/detection_rate_results.rds
   cone_of_silence_m:
     "9090": 300
-    "7360": 150
+    "7360": 300
   bin_widths_seconds: [1, 2, 3, 4, 5]
   shifted_bin_fraction: 0.5
   drone_evaluation_step_seconds: 0.1
