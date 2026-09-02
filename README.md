@@ -97,4 +97,4 @@ Two author decisions remain:
 1. Select and add the code license. MIT is a common permissive option, but the copyright holder must approve it.
 2. Add the final paper title, author list, DOI or preprint link, and approved data repository/access statement to a `CITATION.cff` file and `DATA_AVAILABILITY.md`.
 
-Do not make the repository public until data-sharing permissions and location-information disclosure have been reviewed by the authors and PI.
+Before final submission tentatively update these two things.
