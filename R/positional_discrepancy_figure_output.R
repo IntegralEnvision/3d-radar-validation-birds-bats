@@ -1,8 +1,8 @@
-# Reusable positional-deviation paper-figure functions.
+# Reusable positional-discrepancy paper-figure functions.
 
-save_positional_deviation_figures <- function(
+save_positional_discrepancy_figures <- function(
     plot_objects,
-    output_dir = project_path("output", "positional_deviation")) {
+    output_dir = project_path("output", "positional_discrepancy")) {
   list2env(plot_objects, envir = environment())
 ########################################
 # Saving Plots

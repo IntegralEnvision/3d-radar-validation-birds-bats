@@ -1,26 +1,26 @@
-# Reusable all-behavior pipeline for the positional-deviation analysis only.
+# Reusable all-behavior pipeline for the positional-discrepancy analysis only.
 
-positional_deviation_behavior_configuration <- data.frame(
+positional_discrepancy_behavior_configuration <- data.frame(
   metadata_behavior = c("Foraging", "DynoSoaring", "Transiting", "Chasing", "Cube"),
   result_key = c("foraging", "soaring", "transiting", "chasing", "cubes"),
   analysis_label = c("Foraging", "Soaring", "Transiting", "Chasing", "Cubes"),
   stringsAsFactors = FALSE
 )
 
-run_positional_deviation_behavior <- function(
+run_positional_discrepancy_behavior <- function(
     metadata_behavior,
     metadata = read_flight_metadata(),
     radar_y_offsets_by_type = c("9090" = 20, "7360" = 0)) {
-  config <- positional_deviation_behavior_configuration[
-    positional_deviation_behavior_configuration$metadata_behavior == metadata_behavior,
+  config <- positional_discrepancy_behavior_configuration[
+    positional_discrepancy_behavior_configuration$metadata_behavior == metadata_behavior,
     , drop = FALSE
   ]
-  if (nrow(config) != 1L) stop("Unknown positional-deviation behavior: ", metadata_behavior, call. = FALSE)
+  if (nrow(config) != 1L) stop("Unknown positional-discrepancy behavior: ", metadata_behavior, call. = FALSE)
   flights <- metadata[
-    metadata$behavior == metadata_behavior & metadata$positional_deviation_include,
+    metadata$behavior == metadata_behavior & metadata$positional_discrepancy_include,
     , drop = FALSE
   ]
-  if (!nrow(flights)) stop("No included positional-deviation flights for: ", metadata_behavior, call. = FALSE)
+  if (!nrow(flights)) stop("No included positional-discrepancy flights for: ", metadata_behavior, call. = FALSE)
   root <- find_project_root()
   flight_results <- vector("list", nrow(flights))
   display_times <- character(nrow(flights))
@@ -31,8 +31,8 @@ run_positional_deviation_behavior <- function(
     time_digits <- sub("^.*_", "", row$radar_object[[1]])
     meridiem <- if (as.integer(format(local_start, "%H", tz = "America/Los_Angeles")) < 12) "AM" else "PM"
     display_times[[i]] <- paste0(substr(time_digits, 1, 2), "-", substr(time_digits, 3, 4), meridiem)
-    message("Positional deviation: ", row$flight_id[[1]], "...")
-    flight_results[[i]] <- analyze_positional_deviation_flight(
+    message("Positional discrepancy: ", row$flight_id[[1]], "...")
+    flight_results[[i]] <- analyze_positional_discrepancy_flight(
       radar_df = read.csv(file.path(root, row$radar_file[[1]])),
       drone_df = read.csv(file.path(root, row$drone_file[[1]])),
       offset_GPS = row$offset_GPS[[1]],
@@ -72,15 +72,15 @@ run_positional_deviation_behavior <- function(
   )
 }
 
-run_positional_deviation_analysis <- function(
-    behaviors = positional_deviation_behavior_configuration$metadata_behavior,
+run_positional_discrepancy_analysis <- function(
+    behaviors = positional_discrepancy_behavior_configuration$metadata_behavior,
     metadata_path = project_path("metadata", "flights.csv"),
     radar_y_offsets_by_type = c("9090" = 20, "7360" = 0),
-    results_path = positional_deviation_bundle_path()) {
+    results_path = positional_discrepancy_bundle_path()) {
   metadata <- read_flight_metadata(path = metadata_path)
-  selected <- lapply(behaviors, run_positional_deviation_behavior,
+  selected <- lapply(behaviors, run_positional_discrepancy_behavior,
                      metadata = metadata, radar_y_offsets_by_type = radar_y_offsets_by_type)
-  bundle <- new_positional_deviation_bundle()
+  bundle <- new_positional_discrepancy_bundle()
   for (result in selected) {
     bundle$behaviors[[result$result_key]] <- list(
       paired_data = result$paired_data,
@@ -90,10 +90,10 @@ run_positional_deviation_analysis <- function(
     )
   }
   bundle$updated_at_utc <- format(Sys.time(), tz = "UTC", usetz = TRUE)
-  validate_positional_deviation_bundle(bundle, require_all_behaviors = length(behaviors) == 5L)
+  validate_positional_discrepancy_bundle(bundle, require_all_behaviors = length(behaviors) == 5L)
   dir.create(dirname(results_path), recursive = TRUE, showWarnings = FALSE)
   saveRDS(bundle, results_path)
   saved <- readRDS(results_path)
-  validate_positional_deviation_bundle(saved, require_all_behaviors = length(behaviors) == 5L)
+  validate_positional_discrepancy_bundle(saved, require_all_behaviors = length(behaviors) == 5L)
   invisible(saved)
 }

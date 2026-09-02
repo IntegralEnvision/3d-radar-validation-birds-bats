@@ -2,7 +2,7 @@
 
 source(file.path("R", "analysis_config.R"))
 source(file.path("R", "flight_metadata.R"))
-source(file.path("R", "positional_deviation_bundle.R"))
+source(file.path("R", "positional_discrepancy_bundle.R"))
 source(file.path("R", "detection_rate_bundle.R"))
 
 arguments <- commandArgs(trailingOnly = TRUE)
@@ -11,7 +11,7 @@ config <- load_analysis_config()
 
 stopifnot(
   identical(config$expected_number_of_flights, 85L),
-  identical(config$positional_deviation$radar_y_offsets_m, c("9090" = 20, "7360" = 0)),
+  identical(config$positional_discrepancy$radar_y_offsets_m, c("9090" = 20, "7360" = 0)),
   identical(config$detection_rate$cone_of_silence_m, c("9090" = 300, "7360" = 150)),
   identical(config$detection_rate$bin_widths_seconds, c(1, 2, 3, 4, 5)),
   identical(config$detection_rate$shifted_bin_fraction, 0.5)
@@ -43,9 +43,9 @@ baseline_files <- list.files(
 )
 stopifnot(length(baseline_files) == 12L)
 
-if (file.exists(positional_deviation_bundle_path())) {
-  validate_positional_deviation_bundle(
-    readRDS(positional_deviation_bundle_path()),
+if (file.exists(positional_discrepancy_bundle_path())) {
+  validate_positional_discrepancy_bundle(
+    readRDS(positional_discrepancy_bundle_path()),
     require_all_behaviors = TRUE
   )
 }

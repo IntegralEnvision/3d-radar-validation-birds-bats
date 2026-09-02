@@ -4,12 +4,12 @@ expected_number_of_flights: 85
 projected_crs: 32611
 
 outputs:
-  positional_figures: output/positional_deviation
+  positional_figures: output/positional_discrepancy
   detection_figures: output/detection_rate
   detection_qc: output/detection_rate_qc
 
-positional_deviation:
-  results_file: derived_data/positional_deviation_results.rds
+positional_discrepancy:
+  results_file: derived_data/positional_discrepancy_results.rds
   radar_y_offsets_m:
     "9090": 20
     "7360": 0

@@ -1,6 +1,6 @@
-# Reusable positional-deviation paper-figure functions.
+# Reusable positional-discrepancy paper-figure functions.
 
-build_positional_deviation_plots <- function(figure_data) {
+build_positional_discrepancy_plots <- function(figure_data) {
   list2env(figure_data, envir = environment())
   before <- ls(envir = environment())
 ########################################
@@ -957,7 +957,7 @@ plot_surface <- function(data, title) {
 
     scale_fill_viridis_c(
       option = "D",
-      name = "Mean Deviation (m)",
+      name = "Mean PD",
       guide = guide_colorbar(
         barheight = unit(2.5, "cm"),
         barwidth = unit(0.4, "cm")
@@ -1088,7 +1088,7 @@ plot_general_bias_surface <- function(data, plot_title = "") {
     ) +
     scale_fill_viridis_c(
       option = "D",
-      name = "Mean Deviation (m)",
+      name = "Mean PD",
       guide = guide_colorbar(
         barheight = unit(2.5, "cm"),
         barwidth = unit(0.4, "cm")
@@ -1199,7 +1199,7 @@ biasPlot_behavior_comparison <- ggplot(
   scale_fill_viridis_c(
     option = "D",
     limits = c(-shared_bias_limit, shared_bias_limit),
-    name = "Mean Deviation (m)"
+    name = "Mean PD"
   ) +
   scale_x_continuous(
     limits = c(0, 1400),

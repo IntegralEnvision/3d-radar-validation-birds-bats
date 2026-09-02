@@ -1,6 +1,6 @@
-# Reusable positional-deviation paper-figure functions.
+# Reusable positional-discrepancy paper-figure functions.
 
-calculate_positional_deviation_statistics <- function(figure_data) {
+calculate_positional_discrepancy_statistics <- function(figure_data) {
   list2env(figure_data, envir = environment())
 ########################################
 # Statistical Analysis

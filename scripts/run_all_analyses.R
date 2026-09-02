@@ -15,8 +15,8 @@ run_script(file.path("scripts", "detection_rate_analysis.R"))
 
 run_script(file.path('scripts', 'detection_rate_figures.R'))
 
-# Positional deviation: approved common-grid alignment for radar detections only.
-run_script(file.path("scripts", "positional_deviation_analysis.R"))
-run_script(file.path("scripts", "positional_deviation_figures.R"))
+# Positional discrepancy: approved common-grid alignment for radar detections only.
+run_script(file.path("scripts", "positional_discrepancy_analysis.R"))
+run_script(file.path("scripts", "positional_discrepancy_figures.R"))
 
 message("\nAll analyses completed successfully.")

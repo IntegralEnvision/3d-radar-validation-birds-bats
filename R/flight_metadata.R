@@ -63,7 +63,7 @@ read_flight_metadata <- function(
     "behavior", "flight_id", "radar_file", "drone_file",
     "radar_location_file", "radar_site", "radar_type", "offset_GPS",
     "configured_start_time", "configured_end_time", "drone_indices",
-    "detection_rate_include", "positional_deviation_include"
+    "detection_rate_include", "positional_discrepancy_include"
   )
   missing_columns <- setdiff(required_columns, names(metadata))
   if (length(missing_columns) > 0L) {
@@ -93,9 +93,9 @@ read_flight_metadata <- function(
     metadata$detection_rate_include,
     "detection_rate_include"
   )
-  metadata$positional_deviation_include <- parse_flag(
-    metadata$positional_deviation_include,
-    "positional_deviation_include"
+  metadata$positional_discrepancy_include <- parse_flag(
+    metadata$positional_discrepancy_include,
+    "positional_discrepancy_include"
   )
   metadata$radar_type <- as.character(metadata$radar_type)
   metadata$offset_GPS <- as.numeric(metadata$offset_GPS)
@@ -145,7 +145,7 @@ read_flight_metadata <- function(
   metadata
 }
 
-load_positional_deviation_inputs <- function(
+load_positional_discrepancy_inputs <- function(
     behavior,
     metadata = read_flight_metadata(),
     envir = parent.frame()) {
@@ -160,12 +160,12 @@ load_positional_deviation_inputs <- function(
   }
 
   selected <- metadata[
-    metadata$behavior == behavior & metadata$positional_deviation_include,
+    metadata$behavior == behavior & metadata$positional_discrepancy_include,
     ,
     drop = FALSE
   ]
   if (nrow(selected) == 0L) {
-    stop("No positional-deviation flights selected for behavior: ", behavior, call. = FALSE)
+    stop("No positional-discrepancy flights selected for behavior: ", behavior, call. = FALSE)
   }
   if (anyDuplicated(c(selected$radar_object, selected$drone_object))) {
     stop("Positional input object names must be unique within ", behavior, ".", call. = FALSE)

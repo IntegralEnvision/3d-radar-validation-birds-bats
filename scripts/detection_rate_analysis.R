@@ -336,7 +336,7 @@ prepare_radar_track <- function(
     )
   ) %>%
     mutate(
-      # Match the established positional-deviation timestamp handling exactly:
+      # Match the established positional-discrepancy timestamp handling exactly:
       # corrected timestamp = raw radar timestamp - offset_GPS.
       radar_timestamp = radar_timestamp_raw - offset_GPS
     ) %>%

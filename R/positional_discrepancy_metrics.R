@@ -1,4 +1,4 @@
-# Metric helpers used by the positional-deviation analysis.
+# Metric helpers used by the positional-discrepancy analysis.
 
 calculate_rmse <- function(deviation) {
   sqrt(mean(deviation^2, na.rm = TRUE))

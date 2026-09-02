@@ -9,7 +9,7 @@
 # note that although it's called "foraging" function and there a references to foraging throughout this file,
 # it has been re-purposed to work for all flight types (universally adapted)
 
-analyze_positional_deviation_flight <- function(
+analyze_positional_discrepancy_flight <- function(
     radar_df,
     drone_df,
 

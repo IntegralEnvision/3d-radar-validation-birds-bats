@@ -1,5 +1,5 @@
 # Reusable data preparation, plotting, statistics, and output functions for the
-# positional-deviation paper figures. The approved flight-alignment calculation
+# positional-discrepancy paper figures. The approved flight-alignment calculation
 # occurs upstream and is not changed here.
 
 theme_flight <- function() {
@@ -16,17 +16,17 @@ theme_flight <- function() {
   mget(object_names, envir = environment, inherits = FALSE)
 }
 
-prepare_positional_deviation_figure_data <- function(
-    bundle = read_positional_deviation_bundle()) {
+prepare_positional_discrepancy_figure_data <- function(
+    bundle = read_positional_discrepancy_bundle()) {
   positional_results <- bundle
   before <- ls(envir = environment())
-# Load the consolidated positional-deviation results.
+# Load the consolidated positional-discrepancy results.
 positional_results <- bundle
-cube_result <- positional_deviation_behavior_result(positional_results, "cubes")
-foraging_result <- positional_deviation_behavior_result(positional_results, "foraging")
-chasing_result <- positional_deviation_behavior_result(positional_results, "chasing")
-soaring_result <- positional_deviation_behavior_result(positional_results, "soaring")
-transiting_result <- positional_deviation_behavior_result(positional_results, "transiting")
+cube_result <- positional_discrepancy_behavior_result(positional_results, "cubes")
+foraging_result <- positional_discrepancy_behavior_result(positional_results, "foraging")
+chasing_result <- positional_discrepancy_behavior_result(positional_results, "chasing")
+soaring_result <- positional_discrepancy_behavior_result(positional_results, "soaring")
+transiting_result <- positional_discrepancy_behavior_result(positional_results, "transiting")
 
 cube_paired <- cube_result$paired_data
 foraging_paired <- foraging_result$paired_data
