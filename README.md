@@ -31,6 +31,18 @@ renv::restore()
 
 The lockfile was generated with R 4.5.1. System libraries required by packages such as `sf` may also be needed on non-Windows systems.
 
+## Configuration
+
+Edit `config/analysis_config.yml` before a full run. The checked-in defaults include:
+
+- 9090 cone of silence: 300 m
+- 7360 cone of silence: 300 m
+- 9090 positional Y offset: 20 m
+- 7360 positional Y offset: 0 m
+- Detection rate temporal windows: 1-5 seconds
+- Temporal window shift fraction: 0.5
+- Drone evaluation interval: 0.1 seconds
+
 ## Data setup
 
 Raw data are not stored in GitHub. Arrange the required files under `data/` using the relative paths in `metadata/flights.csv`. See `DATA_AVAILABILITY.md` and `data/README.md`.
@@ -47,9 +59,9 @@ Without local raw data, the structural checks used by GitHub Actions can be run 
 Rscript "scripts\check_repository.R"
 ```
 
-## Reproducing the analysis
+## Run the complete analysis
 
-After completing the data setup and repository checks, the full analysis can be run using the master script:
+After completing the data setup and repository checks, the full analysis workflows can be run using the master script.
 
 From R/RStudio
 
@@ -63,31 +75,22 @@ From PowerShell
 Rscript "scripts\run_all_analyses.R"
 ```
 
-The master script runs the analysis workflows and generates the summary outputs and figures used in the manuscript.
+The master script runs the repository checks, detection-rate analysis, and positional-discrepancy analysis, and generates the figures used in the manuscript. The two analyses use distinct radar–drone data alignment methods appropriate to their respective objectives.
 
-## Configuration
+### Individual analysis entry points
 
-Edit `config/analysis_config.yml` before a full run. The checked-in defaults include:
+Individual analysis entry points are also available.
 
-- 9090 cone of silence: 300 m
-- 7360 cone of silence: 300 m
-- 9090 positional Y offset: 20 m
-- 7360 positional Y offset: 0 m
-- Detection rate temporal windows: 1-5 seconds
-- Temporal window shift fraction: 0.5
-- Drone evaluation interval: 0.1 seconds
+From R/RStudio
 
-## Run the complete analysis
-
-From the repository root:
-
-```powershell
-Rscript "scripts\run_all_analyses.R"
+```r
+source("scripts/detection_rate_analysis.R")
+source("scripts/detection_rate_figures.R")
+source("scripts/positional_discrepancy_analysis.R")
+source("scripts/positional_discrepancy_figures.R")
 ```
 
-This validates the repository, runs the detection-rate analysis, runs the positional-discrepancy analysis, and creates the paper figures. The runner keeps the two radar-drone data alignment methods separate.
-
-Individual entry points are also available:
+From PowerShell
 
 ```powershell
 Rscript "scripts\detection_rate_analysis.R"
@@ -95,8 +98,6 @@ Rscript "scripts\detection_rate_figures.R"
 Rscript "scripts\positional_discrepancy_analysis.R"
 Rscript "scripts\positional_discrepancy_figures.R"
 ```
-
-Selected result paths and radar parameters can also be overridden with the command-line options documented in the analysis scripts.
 
 ## Generated outputs
 
