@@ -47,6 +47,24 @@ Without local raw data, the structural checks used by GitHub Actions can be run 
 Rscript "scripts\check_repository.R"
 ```
 
+## Reproducing the analysis
+
+After completing the data setup and repository checks, the full analysis can be run using the master script:
+
+From R/RStudio
+
+```r
+source("scripts/run_all_analyses.R")
+```
+
+From PowerShell
+
+```powershell
+Rscript "scripts\run_all_analyses.R"
+```
+
+The master script runs the analysis workflows and generates the summary outputs and figures used in the manuscript.
+
 ## Configuration
 
 Edit `config/analysis_config.yml` before a full run. The checked-in defaults include:
