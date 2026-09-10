@@ -109,11 +109,3 @@ Rscript "scripts\positional_discrepancy_figures.R"
 
 These products remain local and are ignored by Git. The preserved baseline PDFs under `validation/` are intentionally tracked.
 
-## TODO
-
-Two author decisions remain:
-
-1. Select and add the code license. MIT is a common permissive option, but the copyright holder must approve it.
-2. Add the final paper title, author list, DOI or preprint link, and approved data repository/access statement to a `CITATION.cff` file and `DATA_AVAILABILITY.md`.
-
-Before final submission tentatively update these two things.
