@@ -350,9 +350,8 @@ qc_analysis_end <- tail(qc_bins_initial$bin_end, 1)
 print(qc_bins_initial)
 # View(qc_bins_initial)
 
-### JPS Note and potential TODO:
-# The drone does seem to start before the radar has any positions. The code removes points where the drone is within the radar's
-#  zone of silence but if there are any bins still before the radar starts then it assumes that these are misses.
+# Bins before the first radar position are counted as misses when the drone is
+# outside the radar zone of silence.
 
 # ============================================================================
 # STEP 6: INTERPOLATE DRONE POSITION EVERY 0.1 SECOND AT BOTH BIN BOUNDARIES
@@ -454,9 +453,9 @@ print(qc_radar_counts)
 # View(qc_radar_bin_assignments)
 # View(qc_radar_counts)
 
-################# STEP 8b #############################################
-########## JPS: Checking drone and radar bin time alignment ####
-#For a compact comparison:
+# ============================================================================
+# STEP 8B: VERIFY DRONE AND RADAR BIN-TIME ALIGNMENT
+# ============================================================================
 
   qc_bin_time_check <- qc_bins_initial |>
   left_join(
@@ -481,8 +480,8 @@ print(qc_radar_counts)
     by = "bin_id"
   )
 
+# Inspect the representative bin used during alignment validation.
   qc_bin_time_check |> filter(bin_id == 221)
-## Checks out - yay!!!
 
 # ============================================================================
 # STEP 9: CLASSIFY EACH BIN AND IDENTIFY GAP EVENTS
