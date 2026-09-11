@@ -8,7 +8,7 @@ files larger than GitHub's 100 MB limit.
 configuration needed by the analyses. Reproduction requires arranging the data
 under `data/` according to that manifest.
 
-For anonymous peer review, the source-dataset citation and repository identifier
-are withheld from this copy. The approved DOI, accession number, or
-controlled-access instructions will be restored in the public release after the
-authors confirm the sharing terms for the raw data and location information.
+The data and code required to reproduce the analyses are archived together in a
+Zenodo review deposit. An anonymous access link is provided with the manuscript
+submission. The final DOI and public repository citation will be added following
+peer review.
