@@ -6,7 +6,6 @@ projected_crs: 32611
 outputs:
   positional_figures: output/positional_discrepancy
   detection_figures: output/detection_rate
-  detection_qc: output/detection_rate_qc
 
 positional_discrepancy:
   results_file: derived_data/positional_discrepancy_results.rds

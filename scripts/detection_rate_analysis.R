@@ -1061,17 +1061,6 @@ print(
 
 # Useful interactive commands:
 #
-# View(flight_configuration)
-# View(analysis_failures)
-# View(bin_option_failures)
-# # View(bin_option_availability_summary)
-# View(all_flight_detection_summary)
-# View(behavior_detection_summary)
-# View(behavior_gap_summary)
-# View(radar_type_detection_summary)
-# View(radar_type_gap_summary)
-# View(behavior_radar_detection_summary)
-# View(all_detection_bins %>% filter(!eligible))
 # ==============================================================================
 
 # Save one consolidated intermediate bundle before creating figures.

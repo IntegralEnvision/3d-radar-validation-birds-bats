@@ -36,8 +36,6 @@ The bundle contains:
 - analysis failures, unavailable bin options, and availability summaries for quality control.
 
 The recorded opportunity method is complete_drone_coverage_bins. This is intentionally separate from the approved common-grid alignment used by positional deviation.
-The canonical detection-rate bundle uses radar-specific defaults: 300 m for radar 9090 and 150 m for radar 7360. Users can override either distance before a full run. For example:
+The canonical detection-rate bundle uses a 300 m cone-of-silence threshold for both radar 9090 and radar 7360. Users can override either distance before a full run. For example:
 
     Rscript "scripts/detection_rate_analysis.R" --cone-9090-meters=325 --cone-7360-meters=175 --results-file=derived_data/detection_rate_results_custom.rds
-
-The uniform 250 m and 300 m bundles are retained as sensitivity artifacts; they are not the canonical radar-specific analysis.

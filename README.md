@@ -103,7 +103,6 @@ Rscript "scripts\positional_discrepancy_figures.R"
 
 - `output/detection_rate/` - detection-rate figures and summary tables.
 - `output/positional_discrepancy/` - positional-discrepancy figures.
-- `output/detection_rate_qc/` - independent QC outputs.
 - `derived_data/detection_rate_results.rds` - consolidated detection-rate intermediate results.
 - `derived_data/positional_discrepancy_results.rds` - consolidated positional-discrepancy intermediate results.
 

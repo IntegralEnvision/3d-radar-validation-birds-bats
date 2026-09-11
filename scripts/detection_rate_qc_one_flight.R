@@ -45,35 +45,12 @@ if (file.exists(project_path(analysis_config$detection_rate$results_file))) {
 
 
 # ----------------------------------------------------------------------------
-# USER SETTINGS: edit these three values, then run downward section by section
+# USER SETTINGS: edit these four values, then run downward section by section
 # ----------------------------------------------------------------------------
-# PASSED TESTS
 QC_FLIGHT_ID <- "Foraging_01"
 QC_BIN_WIDTH_SECONDS <- 1
-QC_SHIFT_SECONDS <- 0 #Shift is the sensitivity validation
-#
-# QC_FLIGHT_ID <- "DynoSoaring_01"
-# QC_BIN_WIDTH_SECONDS <- 2
-# QC_SHIFT_SECONDS <- 1 #Shift is the sensitivity validation
-
-# QC_FLIGHT_ID <- "Transiting_01"
-# QC_BIN_WIDTH_SECONDS <- 3
-# QC_SHIFT_SECONDS <- 0 #Shift is the sensitivity validation
-
-# QC_FLIGHT_ID <- "Chasing_01"
-# QC_BIN_WIDTH_SECONDS <- 4
-# QC_SHIFT_SECONDS <- 2 #Shift is the sensitivity validation
-
-# FLIGHT_ID <- "Cube_01"
-# QC_BIN_WIDTH_SECONDS <- 5
-# QC_SHIFT_SECONDS <- 0 #Shift is the sensitivity validation
-
-# QC_FLIGHT_ID <- "Foraging_03"
-# QC_BIN_WIDTH_SECONDS <- 1
-# QC_SHIFT_SECONDS <- 0 #Shift is the sensitivity validation
-
-
-
+QC_SHIFT_SECONDS <- 0
+QC_ALIGNMENT_CHECK_BIN_ID <- 221L
 METADATA_CSV <- project_path(analysis_config$metadata_file)
 CONE_OF_SILENCE_METERS_BY_RADAR <- analysis_config$detection_rate$cone_of_silence_m
 DRONE_EVALUATION_STEP_SECONDS <- analysis_config$detection_rate$drone_evaluation_step_seconds
@@ -129,7 +106,6 @@ qc_configured_end <- qc_configuration$configured_end_time[[1]]
 
 print(qc_configuration)
 summary(qc_drone_indices)
-# View(qc_configuration)
 
 
 # ============================================================================
@@ -217,8 +193,6 @@ qc_drone_track <- qc_drone_sf |>
 
 print(qc_drone_track)
 summary(qc_drone_track)
-# View(qc_drone_selected)
-# View(qc_drone_track)
 
 
 # ============================================================================
@@ -272,7 +246,6 @@ qc_radar_track <- tibble(
 
 print(qc_radar_track)
 summary(qc_radar_track)
-# View(qc_radar_track)
 
 # Check with original
 #qc_radar_raw_sorted <- qc_radar_raw |> arrange(as.POSIXct(update_time_1), format ="%m/%d/%Y %H:%M:%OS", tz = "UTC")
@@ -348,7 +321,6 @@ qc_bins_initial <- tibble(
 qc_analysis_end <- tail(qc_bins_initial$bin_end, 1)
 
 print(qc_bins_initial)
-# View(qc_bins_initial)
 
 # Bins before the first radar position are counted as misses when the drone is
 # outside the radar zone of silence.
@@ -397,7 +369,6 @@ qc_position_evaluation <- qc_position_evaluation |>
   )
 
 print(qc_position_evaluation)
-# View(qc_position_evaluation)
 
 # Look at the shape of the filtered bins - should look like things are in the cone of silence at the beginning and end
 plot(qc_position_evaluation$evaluation_time, qc_position_evaluation$drone_distance_to_radar_m)
@@ -426,7 +397,6 @@ qc_bin_eligibility <- qc_position_evaluation |>
   )
 
 print(count(qc_bin_eligibility, has_complete_drone_support, outside_cone_of_silence))
-# View(qc_bin_eligibility)
 
 
 # ============================================================================
@@ -450,8 +420,6 @@ qc_radar_counts <- qc_radar_bin_assignments |>
 
 print(qc_radar_bin_assignments)
 print(qc_radar_counts)
-# View(qc_radar_bin_assignments)
-# View(qc_radar_counts)
 
 # ============================================================================
 # STEP 8B: VERIFY DRONE AND RADAR BIN-TIME ALIGNMENT
@@ -480,8 +448,11 @@ print(qc_radar_counts)
     by = "bin_id"
   )
 
-# Inspect the representative bin used during alignment validation.
-  qc_bin_time_check |> filter(bin_id == 221)
+# Inspect a user-selected representative bin used during alignment validation.
+if (!(QC_ALIGNMENT_CHECK_BIN_ID %in% qc_bin_time_check$bin_id)) {
+  stop("QC_ALIGNMENT_CHECK_BIN_ID does not occur in this run.")
+}
+print(qc_bin_time_check |> filter(bin_id == QC_ALIGNMENT_CHECK_BIN_ID))
 
 # ============================================================================
 # STEP 9: CLASSIFY EACH BIN AND IDENTIFY GAP EVENTS
@@ -562,9 +533,6 @@ qc_gap_events <- qc_eligible_runs |>
 
 print(count(qc_detection_bins, bin_status))
 print(qc_gap_events)
-# View(qc_detection_bins)
-# View(qc_detection_bins |> filter(!eligible))
-# View(qc_gap_events)
 
 ### Cross validate gap events with raw data
 qc_gap_window <- qc_detection_bins |>
@@ -794,7 +762,6 @@ if (exists("all_detection_bins", envir = .GlobalEnv, inherits = FALSE)) {
     )
 
   print(count(qc_bin_comparison, classification_matches))
-  # View(qc_bin_comparison |> filter(!classification_matches))
 }
 
 qc_main_gap_events <- all_gap_events |>
@@ -994,18 +961,4 @@ if (qc_validation_result$overall_pass[[1]]) {
 
 
 # Most useful inspection objects:
-# View(qc_configuration)
-# View(qc_drone_selected)
-# View(qc_drone_track)
-# View(qc_radar_track)
-# View(qc_radar_location)
-# View(qc_bins_initial)
-# View(qc_position_evaluation)
-# View(qc_bin_eligibility)
-# View(qc_radar_bin_assignments)
-# View(qc_detection_bins)
-# View(qc_gap_events)
-# View(qc_detection_summary)
-# View(qc_summary_comparison)
-# View(qc_bin_comparison)
 # ============================================================================
