@@ -153,7 +153,7 @@ figure_detection_rate_by_distance <- ggplot(
        subtitle = "Bands contain at least 20 eligible seconds") +
   theme_bw(base_size = 12) + theme(plot.title = element_text(hjust = 0.5), legend.position = "top")
 
-bin_shift_sensitivity_by_flight <- all_flight_detection_summary |>
+temporal_window_shift_sensitivity_by_flight <- all_flight_detection_summary |>
   select(behavior, flight_id, radar_type, bin_width_seconds,
          bin_start_shift_seconds, detection_rate) |>
   mutate(alignment = if_else(bin_start_shift_seconds == 0, "unshifted", "shifted")) |>
@@ -163,18 +163,18 @@ bin_shift_sensitivity_by_flight <- all_flight_detection_summary |>
   mutate(shift_difference = shifted - unshifted,
          bin_length = factor(bin_width_seconds, levels = BIN_WIDTH_OPTIONS_SECONDS,
                              labels = paste0(BIN_WIDTH_OPTIONS_SECONDS, " s")))
-bin_shift_sensitivity_summary <- bin_shift_sensitivity_by_flight |>
+temporal_window_shift_sensitivity_summary <- temporal_window_shift_sensitivity_by_flight |>
   group_by(bin_width_seconds, bin_length) |>
   summarise(n_paired_flights = n(), median_difference = median(shift_difference),
-            maximum_absolute_difference = max(abs(shift_difference)), .groups = "drop") |> mutate(label_y = max(bin_shift_sensitivity_by_flight$shift_difference) + 0.08 * diff(range(bin_shift_sensitivity_by_flight$shift_difference))); figure_bin_shift_sensitivity <- ggplot(
-  bin_shift_sensitivity_by_flight, aes(bin_length, shift_difference, fill = bin_length)
+            maximum_absolute_difference = max(abs(shift_difference)), .groups = "drop") |> mutate(label_y = max(temporal_window_shift_sensitivity_by_flight$shift_difference) + 0.08 * diff(range(temporal_window_shift_sensitivity_by_flight$shift_difference))); figure_temporal_window_shift_sensitivity <- ggplot(
+  temporal_window_shift_sensitivity_by_flight, aes(bin_length, shift_difference, fill = bin_length)
 ) + geom_hline(yintercept = 0, linetype = "dashed") +
-  geom_boxplot(outlier.shape = 21) + geom_text(data = bin_shift_sensitivity_summary, aes(bin_length, label_y, label = paste0("N = ", n_paired_flights)), inherit.aes = FALSE, vjust = 0) + scale_fill_viridis_d() + scale_y_continuous(labels = pct, expand = expansion(mult = c(.05, .15))) +
-  labs(x = "Bin length", y = "Shifted minus unshifted detection rate",
-       title = "Sensitivity to a half-bin shift") + plot_theme
+  geom_boxplot(outlier.shape = 21) + geom_text(data = temporal_window_shift_sensitivity_summary, aes(bin_length, label_y, label = paste0("N = ", n_paired_flights)), inherit.aes = FALSE, vjust = 0) + scale_fill_viridis_d() + scale_y_continuous(labels = pct, expand = expansion(mult = c(.05, .15))) +
+  labs(x = "Temporal Window", y = "Shifted minus unshifted detection rate",
+       title = "Sensitivity to a half-window shift") + plot_theme
 
 # Unshifted table only; no sensitivity estimates are included.
-radar_type_bin_length_table <- radar_type_detection_summary |>
+radar_type_temporal_window_table <- radar_type_detection_summary |>
   filter(bin_start_shift_seconds == 0) |>
   select(radar_type, bin_width_seconds, n_flights, n_eligible_bins,
          n_detection_bins, pooled_detection_rate, median_flight_detection_rate) |>
@@ -198,7 +198,7 @@ safe_ggsave <- function(...) { tryCatch(ggsave(...), error = function(e) warning
 figure_output_directory <- project_path(analysis_config$outputs$detection_figures)
 dir.create(figure_output_directory, recursive = TRUE, showWarnings = FALSE)
 safe_ggsave(
-  file.path(figure_output_directory, "detection_rate_by_behavior_1s.pdf"),
+  file.path(figure_output_directory, "figure_3_detection_rate_by_behavior.pdf"),
   figure_detection_rate_by_behavior,
   width = 8.2,
   height = 5.7,
@@ -209,7 +209,7 @@ safe_ggsave(file.path(figure_output_directory, "detection_rate_by_radar_type_1s.
 safe_ggsave(file.path(figure_output_directory, "gap_duration_by_behavior_1s.pdf"), figure_gap_duration_by_behavior, width = 8.2, height = 5.7, dpi = 300)
 safe_ggsave(file.path(figure_output_directory, "gap_duration_by_radar_type_1s.pdf"), figure_gap_duration_by_radar_type, width = 7.2, height = 5.5, dpi = 300)
 safe_ggsave(file.path(figure_output_directory, "detection_rate_by_distance_1s.pdf"), figure_detection_rate_by_distance, width = 8.2, height = 5.7, dpi = 300)
-safe_ggsave(file.path(figure_output_directory, "bin_shift_sensitivity.pdf"), figure_bin_shift_sensitivity, width = 8.2, height = 5.7, dpi = 300)
-write.csv(radar_type_bin_length_table,
-          file.path(figure_output_directory, "radar_type_bin_length_table_unshifted.csv"),
+safe_ggsave(file.path(figure_output_directory, "temporal_window_shift_sensitivity.pdf"), figure_temporal_window_shift_sensitivity, width = 8.2, height = 5.7, dpi = 300)
+write.csv(radar_type_temporal_window_table,
+          file.path(figure_output_directory, "radar_type_temporal_window_table_unshifted.csv"),
           row.names = FALSE)
