@@ -55,7 +55,7 @@ all_behaviors <- bind_rows(
   transiting_paired
 )
 
-# Remove random error points
+# Remove random deviation points
 all_behaviors <- all_behaviors %>%
   filter(
     abs(dev_x) <= 100,
@@ -92,13 +92,13 @@ all_rmse <- bind_rows(
   transiting_rmse
 )
 
-# Speeds - bin the speeds and plotting the mean absolute error ± 95% confidence interval
+# Speeds - bin the speeds and plotting the mean absolute deviation ± 95% confidence interval
 speed_data <-
   all_behaviors %>%
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
-    values_to = "error"
+    values_to = "deviation"
   )
 
 

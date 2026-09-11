@@ -24,17 +24,17 @@ kruskal_results <- data.frame(
   p_value = c(kruskal_overall$p.value, kruskal_x$p.value, kruskal_y$p.value, kruskal_z$p.value)
 )
 
-# Distance Effect - check if radar error increases as distance from radar increases
+# Distance Effect - check if radar deviation increases as distance from radar increases
 # use linear mixed regression model
 distance_axis_test <- all_behaviors %>%
-  pivot_longer(cols = c(dev_x, dev_y, dev_z), names_to = "axis", values_to = "error") %>%
-  mutate(abs_error = abs(error))
+  pivot_longer(cols = c(dev_x, dev_y, dev_z), names_to = "axis", values_to = "deviation") %>%
+  mutate(absolute_deviation = abs(deviation))
 
 distance_lmm_results <-
   distance_axis_test %>%
   group_by(axis) %>%
   summarise(
-    model = list(lmer(abs_error ~ distance_to_radar + (1 | unique_flight), data = pick(everything()))), .groups = "drop") %>%
+    model = list(lmer(absolute_deviation ~ distance_to_radar + (1 | unique_flight), data = pick(everything()))), .groups = "drop") %>%
   rowwise() %>%
   summarise(
     axis = axis,
@@ -43,16 +43,16 @@ distance_lmm_results <-
     p_value = coef(summary(model))[2, "Pr(>|t|)"]
   )
 
-# Speed Effect - check if radar error increases as drone speed increases(for each error component)
+# Speed Effect - check if radar deviation increases as drone speed increases(for each deviation component)
 # Run linear mixed regression model
 speed_data <-
   all_behaviors %>%
-  pivot_longer(cols = c(dev_x, dev_y, dev_z), names_to = "axis", values_to = "error") %>%
-  mutate(abs_error = abs(error))
+  pivot_longer(cols = c(dev_x, dev_y, dev_z), names_to = "axis", values_to = "deviation") %>%
+  mutate(absolute_deviation = abs(deviation))
 
 speed_models <- speed_data %>%
   group_by(axis) %>%
-  summarise(model = list(lmer(abs_error ~ speed + (1 | unique_flight), data = pick(everything()))), .groups = "drop")
+  summarise(model = list(lmer(absolute_deviation ~ speed + (1 | unique_flight), data = pick(everything()))), .groups = "drop")
 
 speed_results <- speed_models %>%
   rowwise() %>%
@@ -64,16 +64,16 @@ speed_results <- speed_models %>%
     .groups = "drop"
   )
 
-# Foraging Height - check if radar error increases as drone height increases
+# Foraging Height - check if radar deviation increases as drone height increases
 # use linear mixed-effects regression model
 height_test <- all_behaviors %>%
   filter(behavior == "Foraging") %>%
-  pivot_longer(cols = c(dev_x, dev_y, dev_z), names_to = "axis", values_to = "error") %>%
-  mutate(abs_error = abs(error))
+  pivot_longer(cols = c(dev_x, dev_y, dev_z), names_to = "axis", values_to = "deviation") %>%
+  mutate(absolute_deviation = abs(deviation))
 
 height_models <- height_test %>%
   group_by(axis) %>%
-  summarise(model = list(lmer(abs_error ~ z__drone + (1 | unique_flight), data = pick(everything()))), .groups = "drop")
+  summarise(model = list(lmer(absolute_deviation ~ z__drone + (1 | unique_flight), data = pick(everything()))), .groups = "drop")
 
 height_results <- height_models %>%
   rowwise() %>%

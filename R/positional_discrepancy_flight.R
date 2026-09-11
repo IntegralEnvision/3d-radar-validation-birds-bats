@@ -392,13 +392,13 @@ analyze_positional_discrepancy_flight <- function(
   p_off <- ggplot(lag_results, aes(x = lag, y = rmse_y)) + geom_line() + geom_point() + theme_minimal()
 
   #################################
-  # plot to show deviation of position error (rmse)
+  # Plot the distribution of positional deviations (RMSD)
   #################################
   custom_colors <- c(
-    "X Error" = "#a6cee3",
-    "Y Error" = "#1f78b4",
-    "Z Error" = "#b2df8a",
-    "Euclidean Error" = "#33a02c"
+    "X Deviation" = "#a6cee3",
+    "Y Deviation" = "#1f78b4",
+    "Z Deviation" = "#b2df8a",
+    "Euclidean Deviation" = "#33a02c"
   )
 
   # reshape data to long format
@@ -421,15 +421,15 @@ analyze_positional_discrepancy_flight <- function(
 
   deviation_data_long$measure <- recode(
     deviation_data_long$measure,
-    "dev_x" = "X Error",
-    "dev_y" = "Y Error",
-    "dev_z" = "Z Error",
-    "euclidean_distance" = "Euclidean Error"
+    "dev_x" = "X Deviation",
+    "dev_y" = "Y Deviation",
+    "dev_z" = "Z Deviation",
+    "euclidean_distance" = "Euclidean Deviation"
   )
 
   deviation_data_long$measure <- factor(
     deviation_data_long$measure,
-    levels = c("X Error", "Y Error", "Z Error", "Euclidean Error")
+    levels = c("X Deviation", "Y Deviation", "Z Deviation", "Euclidean Deviation")
   )
 
   # calculate quartile and IQR for each measure
@@ -474,17 +474,17 @@ analyze_positional_discrepancy_flight <- function(
     layout(
       margin = list(t = 100, b = 100, l = 100, r = 100),
       title = list(
-        text = "Distribution of Radar–Drone Position Errors and Euclidean Error",
+        text = "Distribution of Radar–Drone Position Deviations and Euclidean Deviation",
         font = list(size = 24)
       ),
 
       xaxis = list(
-        title = "Error Component",
+        title = "Deviation Component",
         titlefont = list(size = 18),
         tickfont = list(size = 16)
       ),
       yaxis = list(
-        title = "Error Magnitude (m)",
+        title = "Deviation Magnitude (m)",
         titlefont = list(size = 18),
         tickfont = list(size = 16)
       ),
@@ -495,29 +495,29 @@ analyze_positional_discrepancy_flight <- function(
       #RMSE annotations
       annotations = list(
         list(
-          x = "X Error",
-          y = max(deviation_data_long$value[deviation_data_long$measure == "X Error"], na.rm = TRUE) + 2,
+          x = "X Deviation",
+          y = max(deviation_data_long$value[deviation_data_long$measure == "X Deviation"], na.rm = TRUE) + 2,
           text = paste0("RMSE: ", round(rmse_x, 2), " m"),
           showarrow = FALSE,
           font = list(size = 14)
         ),
         list(
-          x = "Y Error",
-          y = max(deviation_data_long$value[deviation_data_long$measure == "Y Error"], na.rm = TRUE) + 2,
+          x = "Y Deviation",
+          y = max(deviation_data_long$value[deviation_data_long$measure == "Y Deviation"], na.rm = TRUE) + 2,
           text = paste0("RMSE: ", round(rmse_y, 2), " m"),
           showarrow = FALSE,
           font = list(size = 14)
         ),
         list(
-          x = "Z Error",
-          y = max(deviation_data_long$value[deviation_data_long$measure == "Z Error"], na.rm = TRUE) + 3,
+          x = "Z Deviation",
+          y = max(deviation_data_long$value[deviation_data_long$measure == "Z Deviation"], na.rm = TRUE) + 3,
           text = paste0("RMSE: ", round(rmse_z, 2), " m"),
           showarrow = FALSE,
           font = list(size = 14)
         ),
         list(
-          x = "Euclidean Error",
-          y = max(deviation_data_long$value[deviation_data_long$measure == "Euclidean Error"], na.rm = TRUE) + 3,
+          x = "Euclidean Deviation",
+          y = max(deviation_data_long$value[deviation_data_long$measure == "Euclidean Deviation"], na.rm = TRUE) + 3,
           text = paste0("RMSE: ", round(rmse_euclidean, 2), " m"),
           showarrow = FALSE,
           font = list(size = 14)
@@ -557,16 +557,16 @@ analyze_positional_discrepancy_flight <- function(
     mutate(
       Deviation_Type = recode(
         Deviation_Type,
-        "dev_x" = "X Error",
-        "dev_y" = "Y Error",
-        "dev_z" = "Z Error",
-        "euclidean_distance" = "Euclidean Error"
+        "dev_x" = "X Deviation",
+        "dev_y" = "Y Deviation",
+        "dev_z" = "Z Deviation",
+        "euclidean_distance" = "Euclidean Deviation"
       )
     )
   # set order of labels
   deviation_distance_long$Deviation_Type <- factor(
     deviation_distance_long$Deviation_Type,
-    levels = c("X Error", "Y Error", "Z Error", "Euclidean Error")
+    levels = c("X Deviation", "Y Deviation", "Z Deviation", "Euclidean Deviation")
   )
 
   # create plot of dev vs. distance from radar
@@ -574,36 +574,36 @@ analyze_positional_discrepancy_flight <- function(
     geom_point(alpha = 0.7, shape = 21, color = "black", stroke = 0.5) +
     geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "black") +
 
-    facet_wrap(~Deviation_Type, scales = "free_y") +  # lets each error plot have its own yaxis limits
-    #facet_wrap(~Deviation_Type, scales = "fixed") +    # all error plots set to same yaxis limits
+    facet_wrap(~Deviation_Type, scales = "free_y") +  # lets each deviation plot have its own yaxis limits
+    #facet_wrap(~Deviation_Type, scales = "fixed") +    # all deviation plots set to same yaxis limits
 
     # # for fixed axis across all scatterplots/flights
     # facet_wrap(~Deviation_Type, scales = "free_y") +
     # facetted_pos_scales(
     #   y = list(
-    #     #scale_y_continuous(limits = c(-40, 80)),   # X Error
+    #     #scale_y_continuous(limits = c(-40, 80)),   # X Deviation
     #     scale_y_continuous(
     #       limits = c(-40, 80),
     #       breaks = seq(-25, 75, by = 25),
     #     ),
-    #     #scale_y_continuous(limits = c(-40, 80)),   # Y Error
+    #     #scale_y_continuous(limits = c(-40, 80)),   # Y Deviation
     #     scale_y_continuous(
     #       limits = c(-40, 80),
     #       breaks = seq(-25, 75, by = 25),
     #     ),
-    #     #scale_y_continuous(limits = c(-40, 80)),   # Z Error
+    #     #scale_y_continuous(limits = c(-40, 80)),   # Z Deviation
     #     scale_y_continuous(
     #       limits = c(-40, 80),
     #       breaks = seq(-25, 75, by = 25),
     #     ),
-    #     scale_y_continuous(limits = c(0, 85))     # Euclidean Error
+    #     scale_y_continuous(limits = c(0, 85))     # Euclidean Deviation
     #   )
     # ) +
 
     theme_minimal() +
     labs(
       title = list(
-        text = "Radar–Drone Position Error vs. Distance from Radar",
+        text = "Radar–Drone Position Deviation vs. Distance from Radar",
         font = list(size = 24)
       ),
       x = list(
@@ -612,7 +612,7 @@ analyze_positional_discrepancy_flight <- function(
         tickfont = list(size = 16)
       ),
       y = list(
-        title = "Error (m)",
+        title = "Deviation (m)",
         titlefont = list(size = 18),
         tickfont = list(size = 16)
       )

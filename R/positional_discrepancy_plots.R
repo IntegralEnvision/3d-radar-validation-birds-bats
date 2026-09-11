@@ -7,8 +7,8 @@ build_positional_discrepancy_plots <- function(figure_data) {
 # All Plots
 ########################################
 
-# Speed vs. Radar Error - How does radar error change as drone speed increases?
-# Bin drone speeds and calculate the mean absolute error ± 95% confidence interval
+# Speed vs. Radar Deviation - How does radar deviation change as drone speed increases?
+# Bin drone speeds and calculate the mean absolute deviation ± 95% confidence interval
 speed_summary <-
   speed_data %>%
   mutate(
@@ -16,10 +16,10 @@ speed_summary <-
   ) %>%
   group_by(behavior, axis, speed_bin) %>%
   summarise(
-    mean_error = mean(abs(error), na.rm = TRUE),
-    sd_error = sd(abs(error), na.rm = TRUE),
+    mean_deviation = mean(abs(deviation), na.rm = TRUE),
+    sd_deviation = sd(abs(deviation), na.rm = TRUE),
     n = n(),
-    se = sd_error / sqrt(n),
+    se = sd_deviation / sqrt(n),
     .groups = "drop"
   ) %>%
   filter(n >= 10)
@@ -28,14 +28,14 @@ speedPlot <- ggplot(
   speed_summary,
   aes(
     x = speed_bin,
-    y = mean_error,
+    y = mean_deviation,
     color = behavior
   )
 ) +
   geom_ribbon(
     aes(
-      ymin = mean_error - 1.96 * se,
-      ymax = mean_error + 1.96 * se,
+      ymin = mean_deviation - 1.96 * se,
+      ymax = mean_deviation + 1.96 * se,
       fill = behavior
     ),
     alpha = 0.2,
@@ -55,37 +55,7 @@ speedPlot <- ggplot(
   scale_fill_viridis_d() +
   theme_flight()
 
-# Figure 5: RMSE by behavior - Which flight behavior produces the largest radar errors?
-# rmseByBehav <- ggplot(
-#   all_rmse %>%
-#     filter(measure %in% c("dev_x", "dev_y", "dev_z")),
-#   aes(
-#     x = factor(
-#       behavior,
-#       levels = c("Cubes", "Transiting", "Foraging", "Soaring", "Chasing")
-#     ),
-#     y = RMSE,
-#     fill = behavior
-#   )
-# ) +
-#   geom_boxplot() +
-#   #facet_wrap(~measure) +
-#   facet_wrap(
-#     ~measure,
-#     labeller = labeller(measure = c(
-#       dev_x = "A. X Deviation",
-#       dev_y = "B. Y Deviation",
-#       dev_z = "C. Z Deviation"
-#     ))
-#   ) +
-#   labs(
-#     title = "", #"RMSD by Behavior and Error Component",
-#     x = "Behavior",
-#     y = "RMSD (m)",
-#     fill = "Behavior"
-#   ) +
-#   scale_fill_viridis_d() +
-#   theme_flight()
+# Figure 5: RMSD by behavior
 
 # Panel labels
 panel_labels <- data.frame(
@@ -109,7 +79,13 @@ behavior_levels <- c(
 )
 
 rmse_plot_data <- all_rmse %>%
-  filter(measure %in% c("dev_x", "dev_y", "dev_z"), is.finite(RMSE)) %>%
+  # Match the submitted figure's scale-limit behavior: observations outside
+  # 0-35 m do not contribute to the displayed boxplot statistics.
+  filter(
+    measure %in% c("dev_x", "dev_y", "dev_z"),
+    is.finite(RMSE),
+    dplyr::between(RMSE, 0, 35)
+  ) %>%
   mutate(
     measure = factor(
       measure,
@@ -203,39 +179,39 @@ rmseByBehav <- rmseByBehav +
     legend.position = "none"
   )
 
-# Error vs distance -  Does radar error (x, y, and z) increase as the target moves farther from the radar?
-# Bin distance measurements and compute the mean absolute error ± 95% confidence interval
+# Deviation vs distance -  Does radar deviation (x, y, and z) increase as the target moves farther from the radar?
+# Bin distance measurements and compute the mean absolute deviation ± 95% confidence interval
 # Figure 8
-error_vs_distance_data <-
+deviation_by_distance_data <-
   all_behaviors %>%
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
-    values_to = "error"
+    values_to = "deviation"
   )
 
-error_summary <-
-  error_vs_distance_data %>%
+deviation_summary <-
+  deviation_by_distance_data %>%
   mutate(
     distance_bin = floor(distance_to_radar / 25) * 25
   ) %>%
   group_by(behavior, axis, distance_bin) %>%
   summarise(
-    mean_error = mean(abs(error), na.rm = TRUE),
-    sd_error = sd(abs(error), na.rm = TRUE),
+    mean_deviation = mean(abs(deviation), na.rm = TRUE),
+    sd_deviation = sd(abs(deviation), na.rm = TRUE),
     n = n(),
-    se = sd_error / sqrt(n),
+    se = sd_deviation / sqrt(n),
     .groups = "drop"
   ) %>%
   filter(n >= 10)
 
-behavior_levels <- unique(as.character(error_summary$behavior))
+behavior_levels <- unique(as.character(deviation_summary$behavior))
 
 behavior_levels <-
   c(
     "Cube",
     sort(setdiff(
-      unique(as.character(error_summary$behavior)),
+      unique(as.character(deviation_summary$behavior)),
       "Cube"
     ))
   )
@@ -246,7 +222,7 @@ behavior_labels[behavior_levels == "Cube"] <- "Cubes"
 
 
 # Set behavior order: Cube first, then remaining behaviors alphabetically
-error_summary <- error_summary %>%
+deviation_summary <- deviation_summary %>%
   mutate(
     behavior = factor(
       as.character(behavior),
@@ -265,18 +241,18 @@ panel_labels <- data.frame(
   label = c("(A)", "(B)", "(C)")
 )
 
-errorVsDist <- ggplot(
-  error_summary,
+deviationByDistance <- ggplot(
+  deviation_summary,
   aes(
     x = distance_bin,
-    y = mean_error,
+    y = mean_deviation,
     color = behavior
   )
 ) +
   geom_ribbon(
     aes(
-      ymin = mean_error - 1.96 * se,
-      ymax = mean_error + 1.96 * se,
+      ymin = mean_deviation - 1.96 * se,
+      ymax = mean_deviation + 1.96 * se,
       fill = behavior
     ),
     alpha = 0.2,
@@ -368,10 +344,10 @@ errorVsDist <- ggplot(
     )
 
   )
-# Error Distribution by Behavior - Which behaviors have greater or lessor error variability?
-# Compares the full distribution of signed errors for each flight behavior
-# Wider distributions indicate greater variability in radar error
-drone_error <- data.frame(
+# Deviation Distribution by Behavior - Which behaviors have greater or lessor deviation variability?
+# Compares the full distribution of signed deviations for each flight behavior
+# Wider distributions indicate greater variability in radar deviation
+drone_deviation <- data.frame(
   axis = c("dev_x", "dev_y", "dev_z"),
   lower = c(-5, -5, -15),
   upper = c(5, 5, 15)
@@ -390,7 +366,7 @@ behavior_order <- c(
   "Transiting"
 )
 
-error_vs_distance_data <- error_vs_distance_data %>%
+deviation_by_distance_data <- deviation_by_distance_data %>%
   mutate(
     behavior_display = case_when(
       behavior == "Cube" ~ "Cubes",
@@ -402,8 +378,7 @@ error_vs_distance_data <- error_vs_distance_data %>%
     )
   )
 
-# Check this BEFORE plotting
-levels(error_vs_distance_data$behavior_display)
+levels(deviation_by_distance_data$behavior_display)
 
 panel_labels <- data.frame(
   behavior_display = factor(
@@ -414,17 +389,17 @@ panel_labels <- data.frame(
   label = c("(A)", "(B)", "(C)")
 )
 
-errorDistrib <- ggplot(
-  error_vs_distance_data,
+deviationDistribution <- ggplot(
+  deviation_by_distance_data,
   aes(
-    x = error,
+    x = deviation,
     fill = behavior_display
   )
 ) +
 
-  # Shade the acceptable drone-error range
+  # Shade the acceptable drone-deviation range
   geom_rect(
-    data = drone_error,
+    data = drone_deviation,
     aes(
       xmin = lower,
       xmax = upper,
@@ -436,7 +411,7 @@ errorDistrib <- ggplot(
     inherit.aes = FALSE
   ) +
 
-  # Error distributions
+  # Deviation distributions
   geom_density(alpha = 0.4) +
 
   facet_grid(
@@ -499,30 +474,29 @@ errorDistrib <- ggplot(
     )
 
   )
-# Component error comparison
-# Compare the distributions of signed X, Y, and Z errors across flight behaviors
+# Component deviation comparison
+# Compare the distributions of signed X, Y, and Z deviations across flight behaviors
 component_data <-
   all_behaviors %>%
   pivot_longer(
     c(dev_x,dev_y,dev_z),
     names_to="axis",
-    values_to="error"
+    values_to="deviation"
   ) %>%
-  filter(is.finite(error))
+  filter(is.finite(deviation))
 
-componentError <- ggplot(
+componentDeviation <- ggplot(
   component_data,
   aes(
     x = factor(
         behavior,
         levels = c("Cube", "Transiting", "Foraging", "Soaring", "Chasing")
       ),
-    y=error,
+    y=deviation,
     fill=behavior
   )
 )+
   geom_boxplot()+
-  #facet_wrap(~axis) +
   facet_wrap(
     ~axis,
     labeller = labeller(axis = c(
@@ -541,7 +515,7 @@ componentError <- ggplot(
   theme_flight()
 
 # Mean RMSE bar chart - Figure 6
-# Compare the average RMSE of each error component across flight behaviors
+# Compare the average RMSE of each deviation component across flight behaviors
 
 behavior_summary <-
   all_rmse %>%
@@ -617,15 +591,15 @@ meanRmseBar <- ggplot(
   )
 
 ### (Foraging Flights Only) ###
-# Radar Error vs. Altitude - Does radar bias change with bird altitude during foraging flights?
-# Bin altitudes and compute the mean signed error ± 95% confidence interval
+# Radar Deviation vs. Altitude - Does radar bias change with bird altitude during foraging flights?
+# Bin altitudes and compute the mean signed deviation ± 95% confidence interval
 foraging_height <-
   all_behaviors %>%
   filter(behavior == "Foraging") %>%
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
-    values_to = "error"
+    values_to = "deviation"
   )
 
 height_summary <-
@@ -635,29 +609,28 @@ height_summary <-
   ) %>%
   group_by(axis, height_bin) %>%
   summarise(
-    mean_error = mean(error, na.rm = TRUE),
-    sd_error = sd(error, na.rm = TRUE),
+    mean_deviation = mean(deviation, na.rm = TRUE),
+    sd_deviation = sd(deviation, na.rm = TRUE),
     n = n(),
-    se = sd_error / sqrt(n),
+    se = sd_deviation / sqrt(n),
     .groups = "drop"
   ) %>%
   filter(n >= 10)
 
 heightPlot <- ggplot(
   height_summary,
-  aes(x = height_bin, y = mean_error)
+  aes(x = height_bin, y = mean_deviation)
 ) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_ribbon(
     aes(
-      ymin = mean_error - 1.96 * se,
-      ymax = mean_error + 1.96 * se
+      ymin = mean_deviation - 1.96 * se,
+      ymax = mean_deviation + 1.96 * se
     ),
     alpha = 0.2
   ) +
   geom_line() +
   geom_point() +
-  #facet_wrap(~axis) +
   facet_wrap(
     ~axis,
     labeller = labeller(axis = c(
@@ -675,7 +648,7 @@ heightPlot <- ggplot(
   theme_flight()
 
 # ------------------------------------------------------------------------------
-# Radar Error vs. Altitude: every behavior plus an all-behaviors comparison
+# Radar Deviation vs. Altitude: every behavior plus an all-behaviors comparison
 # ------------------------------------------------------------------------------
 
 # Repeat the exact Foraging preparation above while retaining behavior as a
@@ -686,17 +659,17 @@ height_summary_by_behavior <-
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
-    values_to = "error"
+    values_to = "deviation"
   ) %>%
   mutate(
     height_bin = floor(z__drone / 5) * 5
   ) %>%
   group_by(behavior, axis, height_bin) %>%
   summarise(
-    mean_error = mean(error, na.rm = TRUE),
-    sd_error = sd(error, na.rm = TRUE),
-    n = sum(!is.na(error)),
-    se = sd_error / sqrt(n),
+    mean_deviation = mean(deviation, na.rm = TRUE),
+    sd_deviation = sd(deviation, na.rm = TRUE),
+    n = sum(!is.na(deviation)),
+    se = sd_deviation / sqrt(n),
     .groups = "drop"
   ) %>%
   filter(n >= 10)
@@ -704,13 +677,13 @@ height_summary_by_behavior <-
 plot_height_by_behavior <- function(data, plot_title = "") {
   ggplot(
     data,
-    aes(x = height_bin, y = mean_error)
+    aes(x = height_bin, y = mean_deviation)
   ) +
     geom_hline(yintercept = 0, linetype = "dashed") +
     geom_ribbon(
       aes(
-        ymin = mean_error - 1.96 * se,
-        ymax = mean_error + 1.96 * se
+        ymin = mean_deviation - 1.96 * se,
+        ymax = mean_deviation + 1.96 * se
       ),
       alpha = 0.2
     ) +
@@ -761,7 +734,7 @@ heightPlot_all_behaviors <- ggplot(
   height_summary_by_behavior,
   aes(
     x = height_bin,
-    y = mean_error,
+    y = mean_deviation,
     color = behavior,
     fill = behavior
   )
@@ -769,8 +742,8 @@ heightPlot_all_behaviors <- ggplot(
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_ribbon(
     aes(
-      ymin = mean_error - 1.96 * se,
-      ymax = mean_error + 1.96 * se
+      ymin = mean_deviation - 1.96 * se,
+      ymax = mean_deviation + 1.96 * se
     ),
     alpha = 0.08,
     color = NA
@@ -793,98 +766,29 @@ heightPlot_all_behaviors <- ggplot(
   ) +
   theme_flight()
 
-# Optional linear model used to test the interaction between distance to radar and altitude on radar error
+# Optional linear model used to test the interaction between distance to radar and altitude on radar deviation
 # foraging_model_data <-
 #   all_behaviors %>%
 #   filter(behavior == "Foraging") %>%
 #   pivot_longer(
 #     cols = c(dev_x, dev_y, dev_z),
 #     names_to = "axis",
-#     values_to = "error"
+#     values_to = "deviation"
 #   )
 # model <- lm(
-#   error ~ distance_to_radar * z__drone,
+#   deviation ~ distance_to_radar * z__drone,
 #   data = foraging_model_data
 # )
 
-# Radar Bias and Accuracy Landscapes - How does radar performance change across both distance to radar and altitude
-# Compute mean signed error (bias)
-# Compute mean absolute error (accuracy)
-## Figure 9
+# Figure 9: radar bias and accuracy across distance and altitude
 
-# foraging_landscape <-
-#   all_behaviors %>%
-#   filter(behavior == "Foraging") %>%
-#   pivot_longer(
-#     cols = c(dev_x, dev_y, dev_z),
-#     names_to = "axis",
-#     values_to = "error"
-#   ) %>%
-#   mutate(
-#     dist_bin = floor(distance_to_radar / 25) * 25,
-#     height_bin = floor(z__drone / 10) * 10
-#   )
-# bias_surface <-
-#   foraging_landscape %>%
-#   group_by(axis, dist_bin, height_bin) %>%
-#   summarise(
-#     value = mean(error, na.rm = TRUE),
-#     n = n(),
-#     .groups = "drop"
-#   ) %>%
-#   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
-# accuracy_surface <-
-#   foraging_landscape %>%
-#   group_by(axis, dist_bin, height_bin) %>%
-#   summarise(
-#     value = mean(abs(error), na.rm = TRUE),
-#     n = n(),
-#     .groups = "drop"
-#   ) %>%
-#   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
-# plot_surface <- function(data, title) {
-#   ggplot(data, aes(x = dist_bin, y = height_bin, fill = value)) +
-#     geom_tile() +
-#     #facet_wrap(~axis) +
-#     facet_wrap(
-#       ~axis,
-#       labeller = labeller(axis = c(
-#         dev_x = "A. X Deviation",
-#         dev_y = "B. Y Deviation",
-#         dev_z = "C. Z Deviation"
-#       ))
-#     ) +
-#     scale_fill_viridis_c(
-#       option = "A",
-#       name = "Mean Deviation (m)"
-#     ) +
-#     #scale_fill_gradient2(
-#     #  low = "blue",
-#     #  mid = "white",
-#     #  high = "red",
-#     #  midpoint = 0
-#     #) +
-#     labs(
-#       x = "Distance to Radar (m)",
-#       y = "Altitude (m)",
-#       #fill = "Mean Error",
-#       title = title
-#     ) +
-#     theme_flight()
-# }
-# biasPlot <- plot_surface(
-#   bias_surface,
-#   #"Foraging Flights: Radar Bias (Signed Error)"
-#   #"Foraging Flights: Radar Bias (Signed Deviation)"
-#   ""
-# )
 foraging_landscape <-
   all_behaviors %>%
   filter(behavior == "Foraging") %>%
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
-    values_to = "error"
+    values_to = "deviation"
   ) %>%
   mutate(
     dist_bin = floor(distance_to_radar / 25) * 25,
@@ -895,8 +799,8 @@ bias_surface <-
   foraging_landscape %>%
   group_by(axis, dist_bin, height_bin) %>%
   summarise(
-    value = mean(error, na.rm = TRUE),
-    n = sum(!is.na(error)),
+    value = mean(deviation, na.rm = TRUE),
+    n = sum(!is.na(deviation)),
     .groups = "drop"
   ) %>%
   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
@@ -905,8 +809,8 @@ accuracy_surface <-
   foraging_landscape %>%
   group_by(axis, dist_bin, height_bin) %>%
   summarise(
-    value = mean(abs(error), na.rm = TRUE),
-    n = sum(!is.na(error)),
+    value = mean(abs(deviation), na.rm = TRUE),
+    n = sum(!is.na(deviation)),
     .groups = "drop"
   ) %>%
   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
@@ -1017,7 +921,7 @@ all_behavior_landscape <-
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
-    values_to = "error"
+    values_to = "deviation"
   ) %>%
   mutate(
     dist_bin = floor(distance_to_radar / 25) * 25,
@@ -1028,8 +932,8 @@ bias_surface_by_behavior <-
   all_behavior_landscape %>%
   group_by(behavior, axis, dist_bin, height_bin) %>%
   summarise(
-    value = mean(error, na.rm = TRUE),
-    n = sum(!is.na(error)),
+    value = mean(deviation, na.rm = TRUE),
+    n = sum(!is.na(deviation)),
     .groups = "drop"
   ) %>%
   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 35, 140))
@@ -1041,8 +945,8 @@ bias_surface_all_behaviors <-
   all_behavior_landscape %>%
   group_by(axis, dist_bin, height_bin) %>%
   summarise(
-    value = mean(error, na.rm = TRUE),
-    n = sum(!is.na(error)),
+    value = mean(deviation, na.rm = TRUE),
+    n = sum(!is.na(deviation)),
     .groups = "drop"
   ) %>%
   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 35, 140))
@@ -1208,7 +1112,6 @@ biasPlot_behavior_comparison <- ggplot(
 
 accuracyPlot <- ggplot(filter(accuracy_surface, is.finite(value)), aes(x = dist_bin, y = height_bin, fill = value)) +
   geom_tile() +
-  #facet_wrap(~axis) +
   facet_wrap(
     ~axis,
     labeller = labeller(axis = c(
@@ -1220,19 +1123,13 @@ accuracyPlot <- ggplot(filter(accuracy_surface, is.finite(value)), aes(x = dist_
   scale_fill_viridis_c(
     name = "Mean Abs Deviation (m)"
   ) +
-  #scale_fill_gradient(
-  #  low = "white",
-  #  high = "red"
-  #) +
   labs(
     x = "Distance to Radar (m)",
     y = "Altitude (m)",
-    #fill = "Mean Abs Error",
     title = "Foraging Flights: Radar Accuracy (Magnitude)"
   ) +
   theme_flight()
 
-#combinedPlot <- biasPlot / accuracyPlot
 combinedPlot <- biasPlot
 # Retain the bias surface as the standalone combined output.
 combinedPlot

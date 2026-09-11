@@ -50,7 +50,7 @@ run_positional_discrepancy_behavior <- function(
     dplyr::mutate(
       behavior = config$analysis_label[[1]],
       unique_flight = paste(config$analysis_label[[1]], flight_id, sep = "_"),
-      error_sqrt = sqrt(euclidean_distance)
+      deviation_sqrt = sqrt(euclidean_distance)
     )
   rmse <- dplyr::bind_rows(lapply(seq_along(flight_results), function(i) {
     result <- flight_results[[i]]
