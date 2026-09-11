@@ -34,7 +34,7 @@ distance_lmm_results <-
   distance_axis_test %>%
   group_by(axis) %>%
   summarise(
-    model = list(lmer(abs_error ~ distance_to_radar + (1 | unique_flight), data = cur_data())), .groups = "drop") %>%
+    model = list(lmer(abs_error ~ distance_to_radar + (1 | unique_flight), data = pick(everything()))), .groups = "drop") %>%
   rowwise() %>%
   summarise(
     axis = axis,
@@ -52,7 +52,7 @@ speed_data <-
 
 speed_models <- speed_data %>%
   group_by(axis) %>%
-  summarise(model = list(lmer(abs_error ~ speed + (1 | unique_flight), data = cur_data())), .groups = "drop")
+  summarise(model = list(lmer(abs_error ~ speed + (1 | unique_flight), data = pick(everything()))), .groups = "drop")
 
 speed_results <- speed_models %>%
   rowwise() %>%
@@ -73,7 +73,7 @@ height_test <- all_behaviors %>%
 
 height_models <- height_test %>%
   group_by(axis) %>%
-  summarise(model = list(lmer(abs_error ~ z__drone + (1 | unique_flight), data = cur_data())), .groups = "drop")
+  summarise(model = list(lmer(abs_error ~ z__drone + (1 | unique_flight), data = pick(everything()))), .groups = "drop")
 
 height_results <- height_models %>%
   rowwise() %>%

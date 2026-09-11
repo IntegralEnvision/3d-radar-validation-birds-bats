@@ -41,11 +41,11 @@ speedPlot <- ggplot(
     alpha = 0.2,
     color = NA
   ) +
-  geom_line(size = 0.75) +
+  geom_line(linewidth = 0.75) +
   geom_point(size = 1) +
   facet_wrap(~axis) +
   labs(
-    title = "", # OLD Mean Absolute Error vs Drone Speed",
+    title = "",
     x = "Drone Speed (m/s)",
     y = "Mean Absolute Deviation (m)",
     color = "Behavior",
@@ -109,7 +109,7 @@ behavior_levels <- c(
 )
 
 rmse_plot_data <- all_rmse %>%
-  filter(measure %in% c("dev_x", "dev_y", "dev_z")) %>%
+  filter(measure %in% c("dev_x", "dev_y", "dev_z"), is.finite(RMSE)) %>%
   mutate(
     measure = factor(
       measure,
@@ -162,10 +162,10 @@ rmseByBehav <- ggplot(
   ) +
 
   scale_y_continuous(
-    limits = c(0, 35),
     breaks = seq(0, 30, 10),
     expand = c(0, 0)
   ) +
+  coord_cartesian(ylim = c(0, 35)) +
 
   scale_fill_viridis_d() +
 
@@ -197,8 +197,6 @@ rmseByBehav <- ggplot(
     panel.spacing = unit(0.7, "lines")
   )
 
-# TODO: JPS: In final code edits make this universally set for all plots,
-# perhaps a part of the plot themes
 rmseByBehav <- rmseByBehav +
   theme(
     text = element_text(family = "sans", size = 12),
@@ -296,8 +294,7 @@ errorVsDist <- ggplot(
     ),
     linetype = "dotted",
     color = "black",
-    linewidth = 0.8,
-    inherit.aes = FALSE
+    linewidth = 0.8
   ) +
   facet_wrap(~axis, ncol=1) +
   geom_text(
@@ -383,15 +380,7 @@ drone_error <- data.frame(
 # Sorting Behaviors
 # Set behavior order: Cubes first, then alphabetical
 # Figure 7
-# TODO - JPS for some reason in this dataset Cubes got called Cube - QC this and make sure it is corrected
-
-# behavior_order <- c(
-#   "Cube",
-#   "Chasing",
-#   "Diving",
-#   "Foraging",
-#   "Soaring"
-# )
+# Map the singular analysis label to the plural display label.
 # Explicit behavior order for display
 behavior_order <- c(
   "Cubes",
@@ -518,11 +507,12 @@ component_data <-
     c(dev_x,dev_y,dev_z),
     names_to="axis",
     values_to="error"
-  )
+  ) %>%
+  filter(is.finite(error))
 
 componentError <- ggplot(
   component_data,
-  aes( # JPS edits to x to get proper order for behavior
+  aes(
     x = factor(
         behavior,
         levels = c("Cube", "Transiting", "Foraging", "Soaring", "Chasing")
@@ -542,9 +532,9 @@ componentError <- ggplot(
     ))
   ) +
   labs(
-    title = "", #OLD title "Component-wise Error by Behavior",
+    title = "",
     x = "Behavior",
-    y = "Deviation", #Old Error (m)",
+    y = "Deviation",
     fill = "Behavior"
   ) +
   scale_fill_viridis_d() +
@@ -555,7 +545,7 @@ componentError <- ggplot(
 
 behavior_summary <-
   all_rmse %>%
-  filter(measure %in% c("dev_x", "dev_y", "dev_z")) %>%
+  filter(measure %in% c("dev_x", "dev_y", "dev_z"), is.finite(RMSE)) %>%
   group_by(
     behavior,
     measure
@@ -678,8 +668,8 @@ heightPlot <- ggplot(
   ) +
   labs(
     x = "Altitude (m)",
-    y = "Mean Signed Deviation (m)", #Old"Mean Signed Error (m)",
-    title = "",#OLD "Foraging Flights: Radar Bias vs Altitude"
+    y = "Mean Signed Deviation (m)",
+    title = ""
   ) +
   scale_fill_viridis_d(name = "Mean Deviation") +
   theme_flight()
@@ -842,7 +832,7 @@ heightPlot_all_behaviors <- ggplot(
 #     n = n(),
 #     .groups = "drop"
 #   ) %>%
-#   filter(n >= 10)
+#   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
 # accuracy_surface <-
 #   foraging_landscape %>%
 #   group_by(axis, dist_bin, height_bin) %>%
@@ -851,7 +841,7 @@ heightPlot_all_behaviors <- ggplot(
 #     n = n(),
 #     .groups = "drop"
 #   ) %>%
-#   filter(n >= 10)
+#   filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
 # plot_surface <- function(data, title) {
 #   ggplot(data, aes(x = dist_bin, y = height_bin, fill = value)) +
 #     geom_tile() +
@@ -890,10 +880,7 @@ heightPlot_all_behaviors <- ggplot(
 # )
 foraging_landscape <-
   all_behaviors %>%
-  filter(
-    behavior == "Foraging",
-    distance_to_radar > 60
-  ) %>%
+  filter(behavior == "Foraging") %>%
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
@@ -909,20 +896,20 @@ bias_surface <-
   group_by(axis, dist_bin, height_bin) %>%
   summarise(
     value = mean(error, na.rm = TRUE),
-    n = n(),
+    n = sum(!is.na(error)),
     .groups = "drop"
   ) %>%
-  filter(n >= 10)
+  filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
 
 accuracy_surface <-
   foraging_landscape %>%
   group_by(axis, dist_bin, height_bin) %>%
   summarise(
     value = mean(abs(error), na.rm = TRUE),
-    n = n(),
+    n = sum(!is.na(error)),
     .groups = "drop"
   ) %>%
-  filter(n >= 10)
+  filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 70, 130))
 panel_labels <- data.frame(
   axis = c("dev_x", "dev_y", "dev_z"),
   label = c("(A)", "(B)", "(C)")
@@ -1023,13 +1010,10 @@ biasPlot <- plot_surface(
 # ------------------------------------------------------------------------------
 # Distance-by-altitude bias surfaces for every behavior
 # ------------------------------------------------------------------------------
-######################### JPS: START QC OF THE BIAS PLOTS... NOT SURE WHY THEY FILTER FOR DISTANCE TO RADAR >60 ##########
-####################### CHECK OUT THE QC STEPS IN THE SCRIPT #########
-# Use the same 25 m distance bins, 10 m altitude bins, signed deviations, minimum
-# distance filter, and minimum cell sample size as the original Foraging surface.
+# Use the same 25 m distance bins, 10 m altitude bins, signed deviations, and
+# minimum cell sample size as the original Foraging surface.
 all_behavior_landscape <-
   all_behaviors %>%
-  filter(distance_to_radar > 60) %>%
   pivot_longer(
     cols = c(dev_x, dev_y, dev_z),
     names_to = "axis",
@@ -1048,7 +1032,7 @@ bias_surface_by_behavior <-
     n = sum(!is.na(error)),
     .groups = "drop"
   ) %>%
-  filter(n >= 10)
+  filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 35, 140))
 
 # Pooling across behavior gives the requested overall surface. This is a
 # descriptive summary of all observations, so behaviors with more points have
@@ -1061,7 +1045,7 @@ bias_surface_all_behaviors <-
     n = sum(!is.na(error)),
     .groups = "drop"
   ) %>%
-  filter(n >= 10)
+  filter(n >= 10, is.finite(value), between(dist_bin, 0, 1400), between(height_bin, 35, 140))
 
 # The original Foraging figure used altitude limits of 70-130 m. The full data
 # span approximately 35-140 m, so these generalized figures use one wider,
@@ -1222,7 +1206,7 @@ biasPlot_behavior_comparison <- ggplot(
     strip.background.x = element_blank()
   )
 
-accuracyPlot <- ggplot(accuracy_surface, aes(x = dist_bin, y = height_bin, fill = value)) +
+accuracyPlot <- ggplot(filter(accuracy_surface, is.finite(value)), aes(x = dist_bin, y = height_bin, fill = value)) +
   geom_tile() +
   #facet_wrap(~axis) +
   facet_wrap(
@@ -1250,7 +1234,7 @@ accuracyPlot <- ggplot(accuracy_surface, aes(x = dist_bin, y = height_bin, fill 
 
 #combinedPlot <- biasPlot / accuracyPlot
 combinedPlot <- biasPlot
-#JPS Edit - Grace only wants biasPlot
+# Retain the bias surface as the standalone combined output.
 combinedPlot
 
 
