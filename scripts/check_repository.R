@@ -12,7 +12,7 @@ config <- load_analysis_config()
 stopifnot(
   identical(config$expected_number_of_flights, 85L),
   identical(config$positional_discrepancy$radar_y_offsets_m, c("9090" = 20, "7360" = 0)),
-  identical(config$detection_rate$cone_of_silence_m, c("9090" = 300, "7360" = 150)),
+  identical(config$detection_rate$cone_of_silence_m, c("9090" = 300, "7360" = 300)),
   identical(config$detection_rate$bin_widths_seconds, c(1, 2, 3, 4, 5)),
   identical(config$detection_rate$shifted_bin_fraction, 0.5)
 )

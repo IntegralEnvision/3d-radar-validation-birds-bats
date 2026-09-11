@@ -5,8 +5,9 @@ Raw radar and drone files are not tracked in Git because the local data director
 The source-dataset citations and repository identifiers are temporarily omitted
 for anonymous peer review and will be restored after review. 
 
-However, the data are currently loaded in the in the `data/`
-directory using the relative paths recorded in `metadata/flights.csv`. The
+However, the data are currently loaded in the `data/` directory using the
+concise `data/<year>/{radar,drone}/...` relative paths recorded in
+`metadata/flights.csv`. The
 metadata registry is the authoritative manifest for the required radar, drone,
 and radar-location files.
 
