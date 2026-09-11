@@ -205,10 +205,10 @@ safe_ggsave(
   dpi = 600,
   device = cairo_pdf
 )
-safe_ggsave(file.path(figure_output_directory, "detection_rate_by_radar_type_1s.pdf"), figure_detection_rate_by_radar_type, width = 7.2, height = 5.5, dpi = 300)
-safe_ggsave(file.path(figure_output_directory, "gap_duration_by_behavior_1s.pdf"), figure_gap_duration_by_behavior, width = 8.2, height = 5.7, dpi = 300)
-safe_ggsave(file.path(figure_output_directory, "gap_duration_by_radar_type_1s.pdf"), figure_gap_duration_by_radar_type, width = 7.2, height = 5.5, dpi = 300)
-safe_ggsave(file.path(figure_output_directory, "detection_rate_by_distance_1s.pdf"), figure_detection_rate_by_distance, width = 8.2, height = 5.7, dpi = 300)
+safe_ggsave(file.path(figure_output_directory, "detection_rate_by_radar_type.pdf"), figure_detection_rate_by_radar_type, width = 7.2, height = 5.5, dpi = 300)
+safe_ggsave(file.path(figure_output_directory, "gap_duration_by_behavior.pdf"), figure_gap_duration_by_behavior, width = 8.2, height = 5.7, dpi = 300)
+safe_ggsave(file.path(figure_output_directory, "gap_duration_by_radar_type.pdf"), figure_gap_duration_by_radar_type, width = 7.2, height = 5.5, dpi = 300)
+safe_ggsave(file.path(figure_output_directory, "detection_rate_by_distance.pdf"), figure_detection_rate_by_distance, width = 8.2, height = 5.7, dpi = 300)
 safe_ggsave(file.path(figure_output_directory, "temporal_window_shift_sensitivity.pdf"), figure_temporal_window_shift_sensitivity, width = 8.2, height = 5.7, dpi = 300)
 write.csv(radar_type_temporal_window_table,
           file.path(figure_output_directory, "radar_type_temporal_window_table_unshifted.csv"),
